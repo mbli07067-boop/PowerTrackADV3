@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0b0c10">
+  <meta name="description" content="PowerTrack — your training, nutrition, strength and fitness progress tracker.">
+  <title>PowerTrack</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <!-- ONBOARDING -->
+  <div id="onboarding" class="onboarding">
+    <div class="onboarding-card glass-card">
+      <div class="language-top">
+        <button id="languageBtnOnboarding" class="secondary-btn small-btn language-btn" type="button">العربية</button>
+      </div>
+
+      <div class="brand-mark" aria-hidden="true">⚡</div>
+      <h1>🏋️ PowerTrack</h1>
+      <p data-i18n="onboardingSubtitle">Your Training, Nutrition &amp; Competitive Arena</p>
+
+      <form id="profileForm">
+        <input type="text" id="name" placeholder="Your Name" data-i18n-placeholder="yourName" autocomplete="name" required>
+        <input type="number" id="age" placeholder="Age" data-i18n-placeholder="age" min="13" max="100" step="1" required>
+
+        <select id="gender" required>
+          <option value="" data-i18n="selectGender">Select Gender</option>
+          <option value="male" data-i18n="male">Male</option>
+          <option value="female" data-i18n="female">Female</option>
+        </select>
+
+        <input type="number" id="height" placeholder="Height (cm)" data-i18n-placeholder="height" min="100" max="250" step="0.1" required>
+        <input type="number" id="weight" placeholder="Weight (kg)" data-i18n-placeholder="weight" min="30" max="350" step="0.1" required>
+
+        <div class="field-with-label">
+          <label for="muscleMass" data-i18n="muscleMass">Muscle Mass</label>
+          <div class="inline-fields">
+            <input type="number" id="muscleMass" placeholder="e.g. 40 or 75" data-i18n-placeholder="muscleMassPlaceholder" min="1" max="200" step="0.1" required>
+            <select id="muscleMassUnit" aria-label="Muscle Mass Unit" data-i18n-aria="muscleMassUnit">
+              <option value="kg">kg</option>
+              <option value="percent">%</option>
+            </select>
+          </div>
+          <small data-i18n="muscleMassHelp">Enter measured muscle mass in kg or your muscle percentage.</small>
+        </div>
+
+        <select id="level" required>
+          <option value="" data-i18n="trainingLevel">Training Level</option>
+          <option value="beginner" data-i18n="beginner">Beginner</option>
+          <option value="intermediate" data-i18n="intermediate">Intermediate</option>
+          <option value="advanced" data-i18n="advanced">Advanced</option>
+        </select>
+
+        <select id="trainingType" required>
+          <option value="" data-i18n="trainingType">Training Type</option>
+          <option value="powerlifting" data-i18n="powerlifting">🏋️ Powerlifting</option>
+          <option value="bodybuilding" data-i18n="bodybuilding">💪 Bodybuilding</option>
+        </select>
+
+        <div id="powerliftingInputs" class="hidden section-box">
+          <h3 data-i18n="powerliftingMaxes">Powerlifting Maxes</h3>
+          <input type="number" id="bench" placeholder="Bench Press 1RM (kg)" data-i18n-placeholder="bench1rm" min="0" step="0.5">
+          <input type="number" id="squat" placeholder="Squat 1RM (kg)" data-i18n-placeholder="squat1rm" min="0" step="0.5">
+          <input type="number" id="deadlift" placeholder="Deadlift 1RM (kg)" data-i18n-placeholder="deadlift1rm" min="0" step="0.5">
+        </div>
+
+        <select id="trainingDays" required>
+          <option value="" data-i18n="trainingDaysPerWeek">Training Days Per Week</option>
+          <option value="3" data-i18n="threeDays">3 Days</option>
+          <option value="4" data-i18n="fourDays">4 Days</option>
+          <option value="5" data-i18n="fiveDays">5 Days</option>
+          <option value="6" data-i18n="sixDays">6 Days</option>
+        </select>
+
+        <div id="daysContainer" class="section-box">
+          <h3 data-i18n="selectTrainingDays">Select Training Days</h3>
+          <div class="days-grid">
+            <label><input type="checkbox" value="Monday"><span data-i18n="monday">Monday</span></label>
+            <label><input type="checkbox" value="Tuesday"><span data-i18n="tuesday">Tuesday</span></label>
+            <label><input type="checkbox" value="Wednesday"><span data-i18n="wednesday">Wednesday</span></label>
+            <label><input type="checkbox" value="Thursday"><span data-i18n="thursday">Thursday</span></label>
+            <label><input type="checkbox" value="Friday"><span data-i18n="friday">Friday</span></label>
+            <label><input type="checkbox" value="Saturday"><span data-i18n="saturday">Saturday</span></label>
+            <label><input type="checkbox" value="Sunday"><span data-i18n="sunday">Sunday</span></label>
+          </div>
+        </div>
+
+        <button type="submit" class="primary-btn" data-i18n="createPlan">Create My Plan 🚀</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MAIN APPLICATION -->
+  <div id="app" class="hidden">
+    <header>
+      <div>
+        <div class="header-title-row">
+          <span class="mini-logo" aria-hidden="true">⚡</span>
+          <h2>🏋️ PowerTrack</h2>
+        </div>
+        <p id="welcomeText"></p>
+      </div>
+
+      <div class="header-actions">
+        <div id="headerRankMini" class="rank-mini"></div>
+        <button id="languageBtn" class="secondary-btn small-btn language-btn" type="button">العربية</button>
+        <button id="resetApp" class="danger-btn" data-i18n="reset" type="button">Reset</button>
+      </div>
+    </header>
+
+    <main>
+      <!-- DASHBOARD -->
+      <section id="dashboard" class="page active">
+        <div class="page-heading">
+          <div>
+            <span class="eyebrow" data-i18n="commandCenter">COMMAND CENTER</span>
+            <h2 data-i18n="dashboardTitle">🏠 Dashboard</h2>
+          </div>
+        </div>
+
+        <div class="dashboard-grid">
+          <div class="card stat-card">
+            <h3 data-i18n="currentWeight">⚖️ Current Weight</h3>
+            <div class="big-number"><span id="currentWeight">0</span> kg</div>
+          </div>
+
+          <div class="card stat-card">
+            <h3 data-i18n="calories">🔥 Calories</h3>
+            <div class="big-number"><span id="consumedCalories">0</span> / <span id="calorieTarget">0</span></div>
+            <div class="progress-bar"><div id="calorieProgress" class="progress"></div></div>
+            <p><span data-i18n="remaining">Remaining:</span> <span id="remainingCalories">0</span> kcal</p>
+          </div>
+
+          <div class="card stat-card">
+            <h3 data-i18n="protein">🥩 Protein</h3>
+            <div class="big-number"><span id="consumedProtein">0</span> / <span id="proteinTarget">0</span> g</div>
+            <div class="progress-bar"><div id="proteinProgress" class="progress"></div></div>
+            <p><span data-i18n="remaining">Remaining:</span> <span id="remainingProtein">0</span> g</p>
+          </div>
+
+          <div class="card stat-card">
+            <h3 data-i18n="todaysWorkout">🏋️ Today's Workout</h3>
+            <div id="todayWorkout">No workout today 💪</div>
+          </div>
+        </div>
+
+        <div class="dashboard-grid lower-grid">
+          <div class="card muscle-summary-card">
+            <div class="card-title-row">
+              <h3 data-i18n="muscleProfile">💪 Muscle Profile</h3>
+              <span class="pill" data-i18n="trainingFactor">Training Factor</span>
+            </div>
+            <div id="dashboardMuscleInfo"></div>
+          </div>
+
+          <div class="card rank-summary-card">
+            <div class="card-title-row">
+              <h3 data-i18n="rankStatus">🏆 Rank Status</h3>
+              <span class="pill accent-pill" data-i18n="competitive">Competitive</span>
+            </div>
+            <div id="dashboardRankInfo"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- WORKOUT -->
+      <section id="workout" class="page">
+        <div class="page-heading">
+          <div>
+            <span class="eyebrow" data-i18n="program">PROGRAM</span>
+            <h2 data-i18n="workoutPlanTitle">🏋️ Workout Plan</h2>
+          </div>
+          <button id="regenerateWorkout" class="secondary-btn" data-i18n="regeneratePlan" type="button">Regenerate Plan</button>
+        </div>
+        <div id="workoutPersonalization" class="card info-card"></div>
+        <div id="workoutPlan"></div>
+      </section>
+
+      <!-- CALORIES AND FOOD SCANNER -->
+      <section id="calories" class="page">
+        <div class="page-heading">
+          <div>
+            <span class="eyebrow" data-i18n="nutrition">NUTRITION</span>
+            <h2 data-i18n="caloriesTracker">🍽️ Calories Tracker</h2>
+          </div>
+        </div>
+
+        <div class="nutrition-grid">
+          <div class="card">
+            <h3 data-i18n="addFoodManually">➕ Add Food Manually</h3>
+            <form id="foodForm">
+              <input type="text" id="foodName" placeholder="Food Name" data-i18n-placeholder="foodName" required>
+              <select id="mealType">
+                <option value="Breakfast" data-i18n="breakfast">Breakfast</option>
+                <option value="Lunch" data-i18n="lunch">Lunch</option>
+                <option value="Dinner" data-i18n="dinner">Dinner</option>
+                <option value="Snacks" data-i18n="snacks">Snacks</option>
+              </select>
+              <input type="number" id="foodCalories" placeholder="Calories" data-i18n-placeholder="caloriesPlaceholder" min="0" step="1" required>
+              <input type="number" id="foodProtein" placeholder="Protein (g)" data-i18n-placeholder="proteinPlaceholder" min="0" step="0.1" required>
+              <input type="number" id="foodCarbs" placeholder="Carbs (g)" data-i18n-placeholder="carbsPlaceholder" min="0" step="0.1" required>
+              <input type="number" id="foodFat" placeholder="Fat (g)" data-i18n-placeholder="fatPlaceholder" min="0" step="0.1" required>
+              <button type="submit" class="primary-btn" data-i18n="addFood">Add Food</button>
+            </form>
+          </div>
+
+          <div class="card ai-food-card">
+            <div class="card-title-row">
+              <h3 data-i18n="aiFoodScanner">📷 AI Food Scanner</h3>
+              <span class="pill accent-pill" data-i18n="ai">AI</span>
+            </div>
+
+            <p data-i18n="foodScannerDescription">Take a photo or upload a food image and let PowerTrack analyze the meal.</p>
+
+            <div class="camera-actions">
+              <label for="foodCameraInput" class="primary-btn camera-btn" data-i18n="takeFoodPhoto">📷 Take Food Photo</label>
+              <input type="file" id="foodCameraInput" accept="image/*" capture="environment" hidden>
+              <label for="foodUploadInput" class="secondary-btn camera-btn" data-i18n="uploadFoodImage">🖼️ Upload Food Image</label>
+              <input type="file" id="foodUploadInput" accept="image/*" hidden>
+            </div>
+
+            <div id="foodImagePreviewContainer" class="food-image-preview hidden">
+              <img id="foodImagePreview" src="" alt="Selected food" data-i18n-alt="selectedFood">
+              <div class="camera-preview-actions">
+                <button type="button" id="removeFoodImage" class="danger-btn" data-i18n="remove">Remove</button>
+                <button type="button" id="analyzeFoodBtn" class="primary-btn" data-i18n="analyzeFood">🤖 Analyze Food with AI</button>
+              </div>
+            </div>
+
+            <div id="aiFoodLoading" class="ai-food-loading hidden">
+              <div class="ai-loading-spinner"></div>
+              <p data-i18n="aiAnalyzing">AI is analyzing your food...</p>
+            </div>
+
+            <div id="aiFoodResult" class="ai-food-result hidden">
+              <h4 data-i18n="aiFoodAnalysis">🤖 AI Food Analysis</h4>
+              <div class="ai-food-result-grid ai-food-edit-grid">
+                <label>
+                  <span data-i18n="food">Food</span>
+                  <input type="text" id="aiFoodName" placeholder="Food name" data-i18n-placeholder="foodName" autocomplete="off" required>
+                </label>
+                <label>
+                  <span data-i18n="quantity">Quantity / serving</span>
+                  <input type="text" id="aiFoodQuantity" placeholder="e.g. 150 g" data-i18n-placeholder="foodQuantity" value="1 serving" required>
+                </label>
+                <label>
+                  <span data-i18n="calories">Calories</span>
+                  <input type="number" id="aiFoodCalories" min="0" step="1" value="0" required>
+                </label>
+                <label>
+                  <span data-i18n="protein">Protein (g)</span>
+                  <input type="number" id="aiFoodProtein" min="0" step="0.1" value="0" required>
+                </label>
+                <label>
+                  <span data-i18n="carbs">Carbs (g)</span>
+                  <input type="number" id="aiFoodCarbs" min="0" step="0.1" value="0" required>
+                </label>
+                <label>
+                  <span data-i18n="fat">Fat (g)</span>
+                  <input type="number" id="aiFoodFat" min="0" step="0.1" value="0" required>
+                </label>
+              </div>
+              <p class="ai-food-note" data-i18n="aiFoodReview">Review the AI estimate before adding it to your daily nutrition.</p>
+              <button type="button" id="addAiFoodBtn" class="primary-btn" data-i18n="addAiResult">✅ Add AI Result to Calories</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 data-i18n="dailyNutrition">📊 Daily Nutrition</h3>
+            <div class="nutrition-lines">
+              <p><span data-i18n="calories">🔥 Calories:</span> <span id="nutritionCalories">0</span></p>
+              <p><span data-i18n="protein">🥩 Protein:</span> <span id="nutritionProtein">0</span> g</p>
+              <p><span data-i18n="carbs">🍚 Carbs:</span> <span id="nutritionCarbs">0</span> g</p>
+              <p><span data-i18n="fat">🥑 Fat:</span> <span id="nutritionFat">0</span> g</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 data-i18n="todaysFood">Today's Food</h3>
+          <div id="foodList"></div>
+        </div>
+      </section>
+
+      <!-- PROGRESS -->
+      <section id="progress" class="page">
+        <div class="page-heading">
+          <div>
+            <span class="eyebrow" data-i18n="history">HISTORY</span>
+            <h2 data-i18n="progressTitle">📈 Progress</h2>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 data-i18n="weightProgress">⚖️ Weight Progress</h3>
+          <form id="weightForm">
+            <input type="number" id="newWeight" placeholder="Enter Weight (kg)" data-i18n-placeholder="enterWeight" min="30" max="350" step="0.1" required>
+            <button type="submit" class="primary-btn" data-i18n="addWeight">Add Weight</button>
+          </form>
+          <canvas id="weightChart"></canvas>
+        </div>
+
+        <div id="strengthProgress" class="card">
+          <h3 data-i18n="strengthProgress">🏋️ Strength Progress</h3>
+          <form id="strengthForm">
+            <input type="number" id="newBench" placeholder="Bench Press (kg)" data-i18n-placeholder="benchPress" min="0" step="0.5">
+            <input type="number" id="newSquat" placeholder="Squat (kg)" data-i18n-placeholder="squat" min="0" step="0.5">
+            <input type="number" id="newDeadlift" placeholder="Deadlift (kg)" data-i18n-placeholder="deadlift" min="0" step="0.5">
+            <button type="submit" class="primary-btn" data-i18n="addStrengthRecord">Add Strength Record</button>
+          </form>
+          <h3><span data-i18n="total">Total:</span> <span id="powerliftingTotal">0</span> kg</h3>
+          <canvas id="strengthChart"></canvas>
+        </div>
+      </section>
+
+      <!-- PROFILE -->
+      <section id="profile" class="page">
+        <div class="page-heading">
+          <div>
+            <span class="eyebrow" data-i18n="identity">IDENTITY</span>
+            <h2 data-i18n="profileTitle">⚙️ Profile</h2>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title-row">
+            <h3 data-i18n="personalData">Personal Data</h3>
+            <button id="editProfileBtn" class="secondary-btn small-btn" data-i18n="edit" type="button">Edit</button>
+          </div>
+          <div id="profileInfo"></div>
+        </div>
+
+        <div class="card">
+          <h3 data-i18n="dailyTargets">🎯 Daily Targets</h3>
+          <form id="targetForm">
+            <input type="number" id="targetCalories" placeholder="Calories Target" data-i18n-placeholder="caloriesTarget" min="0" step="1">
+            <input type="number" id="targetProtein" placeholder="Protein Target" data-i18n-placeholder="proteinTarget" min="0" step="0.1">
+            <input type="number" id="targetCarbs" placeholder="Carbs Target" data-i18n-placeholder="carbsTarget" min="0" step="0.1">
+            <input type="number" id="targetFat" placeholder="Fat Target" data-i18n-placeholder="fatTarget" min="0" step="0.1">
+            <button type="submit" class="primary-btn" data-i18n="saveTargets">Save Targets</button>
+          </form>
+        </div>
+      </section>
+
+      <!-- RANK SYSTEM -->
+      <section id="rank" class="page rank-page">
+        <div class="page-heading">
+          <div>
+            <span class="eyebrow" data-i18n="competitiveIdentity">COMPETITIVE IDENTITY</span>
+            <h2 data-i18n="rankSystem">🏆 Rank System</h2>
+          </div>
+        </div>
+
+        <div id="rankHero"></div>
+        <div class="rank-grid">
+          <div class="card">
+            <h3 data-i18n="rankOverview">Rank Overview</h3>
+            <div id="rankProgressPanel"></div>
+          </div>
+          <div class="card">
+            <h3 data-i18n="rankLadder">🏅 Rank Ladder</h3>
+            <div id="rankLadder"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 1v1 ARENA -->
+      <section id="arena" class="page arena-page">
+        <div class="page-heading">
+          <div>
+            <span class="eyebrow" data-i18n="arena">ARENA</span>
+            <h2 data-i18n="arenaTitle">⚔️ 1v1 Arena</h2>
+          </div>
+        </div>
+
+        <div class="arena-stats" id="arenaStats"></div>
+        <div class="arena-grid">
+          <div class="card">
+            <div class="card-title-row">
+              <h3 data-i18n="sendChallenge">⚔️ Send Challenge</h3>
+              <span class="pill" data-i18n="matchmaking">Matchmaking</span>
+            </div>
+
+            <form id="challengeForm">
+              <select id="opponentSelect" required></select>
+              <select id="challengeType" required>
+                <option value="Bench Press" data-i18n="benchPress">Bench Press</option>
+                <option value="Squat" data-i18n="squat">Squat</option>
+                <option value="Deadlift" data-i18n="deadlift">Deadlift</option>
+                <option value="Total" data-i18n="total">Total</option>
+              </select>
+              <button type="submit" class="primary-btn" data-i18n="sendChallengeButton">Send Challenge</button>
+            </form>
+          </div>
+
+          <div class="card">
+            <h3 data-i18n="pendingChallenges">📨 Pending Challenges</h3>
+            <div id="pendingChallenges"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 data-i18n="matchHistory">📜 Match History</h3>
+          <div id="matchHistory"></div>
+        </div>
+      </section>
+
+      <!-- LEADERBOARD -->
+      <section id="leaderboard" class="page leaderboard-page">
+        <div class="page-heading">
+          <div>
+            <span class="eyebrow" data-i18n="globalCompetition">GLOBAL COMPETITION</span>
+            <h2 data-i18n="leaderboardTitle">🌍 Leaderboard</h2>
+          </div>
+        </div>
+        <div class="card">
+          <div id="leaderboardList"></div>
+        </div>
+      </section>
+
+      <!-- DOCTOR NUTRITION -->
+      <section id="doctorNutrition" class="page doctor-nutrition-page">
+        <div class="page-heading">
+          <div>
+            <span class="eyebrow" data-i18n="professionalNutrition">PROFESSIONAL NUTRITION</span>
+            <h2 data-i18n="doctorNutritionTitle">🩺 Doctor Nutrition</h2>
+          </div>
+        </div>
+
+        <div class="card doctor-subscription-card">
+          <div class="card-title-row">
+            <div>
+              <h3 data-i18n="doctorNutrition">🩺 Doctor Nutrition</h3>
+              <p data-i18n="doctorDescription">Professional nutrition support inside PowerTrack.</p>
+            </div>
+            <span class="pill accent-pill" data-i18n="nutritionService">Nutrition Service</span>
+          </div>
+
+          <div class="doctor-plan-info">
+            <h3 data-i18n="nutritionCarePlan">Nutrition Care Plan</h3>
+            <p data-i18n="nutritionCareDescription">Get personalized nutrition guidance, follow-up, doctor chat and appointment booking.</p>
+
+            <ul class="doctor-features">
+              <li data-i18n="personalizedNutritionPlan">✅ Personalized Nutrition Plan</li>
+              <li data-i18n="chatNutritionDoctor">✅ Chat with Nutrition Doctor</li>
+              <li data-i18n="appointmentBooking">✅ Appointment Booking</li>
+              <li data-i18n="nutritionFollowUp">✅ Nutrition Follow-up</li>
+              <li data-i18n="progressMonitoring">✅ Progress Monitoring</li>
+            </ul>
+
+            <div class="doctor-subscription-action">
+              <strong id="doctorSubscriptionStatus" data-i18n="notSubscribed">Not Subscribed</strong>
+              <button id="doctorSubscribeBtn" class="primary-btn" type="button" data-i18n="subscribeDoctorNutrition">🩺 Subscribe to Doctor Nutrition</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="doctor-grid">
+          <div class="card doctor-chat-card">
+            <div class="card-title-row">
+              <div>
+                <h3 data-i18n="chatWithDoctor">💬 Chat with Doctor</h3>
+                <p data-i18n="doctorChatDescription">Ask your nutrition doctor about your plan.</p>
+              </div>
+              <span class="pill" data-i18n="privateChat">Private Chat</span>
+            </div>
+
+            <div id="doctorChatMessages" class="doctor-chat-messages">
+              <div class="doctor-message doctor-message-incoming">
+                <strong data-i18n="doctorNutrition">Doctor Nutrition</strong>
+                <p data-i18n="doctorWelcomeMessage">Hello! How can I help you with your nutrition today?</p>
+              </div>
+            </div>
+
+            <form id="doctorChatForm" class="doctor-chat-form">
+              <input type="text" id="doctorChatInput" placeholder="Write your message..." data-i18n-placeholder="writeMessage" autocomplete="off">
+              <button type="submit" class="primary-btn" data-i18n="send">Send</button>
+            </form>
+          </div>
+
+          <div class="card doctor-appointment-card">
+            <div class="card-title-row">
+              <div>
+                <h3 data-i18n="bookAppointment">📅 Book Appointment</h3>
+                <p data-i18n="appointmentDescription">Schedule a nutrition consultation.</p>
+              </div>
+            </div>
+
+            <form id="doctorAppointmentForm">
+              <select id="doctorSelect" required>
+                <option value="" data-i18n="selectNutritionDoctor">Select Nutrition Doctor</option>
+                <option value="Doctor Nutrition" data-i18n="doctorNutrition">Doctor Nutrition</option>
+                <option value="Sports Nutrition Doctor" data-i18n="sportsNutritionDoctor">Sports Nutrition Doctor</option>
+              </select>
+
+              <input type="date" id="doctorAppointmentDate" required>
+              <input type="time" id="doctorAppointmentTime" required>
+
+              <select id="doctorAppointmentType" required>
+                <option value="Nutrition Consultation" data-i18n="nutritionConsultation">Nutrition Consultation</option>
+                <option value="Follow-up" data-i18n="followUp">Nutrition Follow-up</option>
+                <option value="Weight Loss" data-i18n="weightLoss">Weight Loss Consultation</option>
+                <option value="Sports Nutrition" data-i18n="sportsNutrition">Sports Nutrition</option>
+              </select>
+
+              <button type="submit" class="primary-btn" data-i18n="bookAppointmentButton">📅 Book Appointment</button>
+            </form>
+
+            <div id="doctorAppointmentStatus" class="doctor-appointment-status" data-i18n="noAppointment">No appointment booked yet.</div>
+          </div>
+        </div>
+
+        <div class="card doctor-followup-card">
+          <div class="card-title-row">
+            <div>
+              <h3 data-i18n="nutritionFollowUpTitle">📊 Nutrition Follow-up</h3>
+              <p data-i18n="followUpDescription">Track your nutrition plan and follow-up progress.</p>
+            </div>
+            <span class="pill accent-pill" data-i18n="followUp">Follow-up</span>
+          </div>
+
+          <div class="doctor-followup-grid">
+            <div class="doctor-followup-item">
+              <span data-i18n="currentWeightLabel">Current Weight</span>
+              <strong id="doctorCurrentWeight">0 kg</strong>
+            </div>
+            <div class="doctor-followup-item">
+              <span data-i18n="dailyCalories">Daily Calories</span>
+              <strong id="doctorCaloriesTarget">0 kcal</strong>
+            </div>
+            <div class="doctor-followup-item">
+              <span data-i18n="proteinTargetLabel">Protein Target</span>
+              <strong id="doctorProteinTarget">0 g</strong>
+            </div>
+            <div class="doctor-followup-item">
+              <span data-i18n="nutritionStatus">Nutrition Status</span>
+              <strong id="doctorNutritionStatus" data-i18n="notStarted">Not Started</strong>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- AI FITNESS COACH -->
+      <section id="aiCoach" class="page ai-coach-page">
+        <div class="page-heading">
+          <div>
+            <span class="eyebrow" data-i18n="aiCoachEyebrow">YOUR PERSONAL TRAINING INTELLIGENCE</span>
+            <h2 data-i18n="aiCoachTitle">🤖 AI Fitness Coach</h2>
+            <p data-i18n="aiCoachSubtitle">Get personalized guidance for training, strength and muscle growth.</p>
+          </div>
+          <span class="pill accent-pill">AI COACH</span>
+        </div>
+
+        <div class="ai-coach-layout">
+          <div class="card ai-coach-chat">
+            <div class="ai-coach-chat-header">
+              <div class="ai-coach-avatar" aria-hidden="true">🤖</div>
+              <div>
+                <h3 data-i18n="aiCoachAssistant">PowerTrack Assistant</h3>
+                <p data-i18n="aiCoachOnline">Training and fitness guidance</p>
+              </div>
+            </div>
+
+            <div id="aiCoachMessages" class="ai-coach-messages" aria-live="polite">
+              <div class="ai-coach-message ai-coach-message-assistant">
+                <strong data-i18n="aiCoachWelcomeTitle">Welcome, athlete! 💪</strong>
+                <p data-i18n="aiCoachWelcome">Ask me about workouts, strength, muscle growth or your training schedule.</p>
+              </div>
+            </div>
+
+            <div class="ai-coach-suggestions">
+              <button type="button" class="ai-coach-suggestion" data-ai-coach-prompt="Help me build a weekly workout plan.">
+                🗓️ <span data-i18n="aiCoachSuggestionPlan">Build my workout plan</span>
+              </button>
+              <button type="button" class="ai-coach-suggestion" data-ai-coach-prompt="How can I improve my strength safely?">
+                🏋️ <span data-i18n="aiCoachSuggestionStrength">Improve my strength</span>
+              </button>
+              <button type="button" class="ai-coach-suggestion" data-ai-coach-prompt="How can I build muscle effectively?">
+                💪 <span data-i18n="aiCoachSuggestionMuscle">Build muscle</span>
+              </button>
+              <button type="button" class="ai-coach-suggestion" data-ai-coach-prompt="Give me advice suitable for my fitness level.">
+                🎯 <span data-i18n="aiCoachSuggestionLevel">Advice for my level</span>
+              </button>
+            </div>
+
+            <form id="aiCoachForm" class="ai-coach-composer">
+              <input type="text" id="aiCoachInput" placeholder="Ask your fitness coach..." data-i18n-placeholder="aiCoachInputPlaceholder" autocomplete="off" maxlength="1500" required>
+              <button type="submit" id="aiCoachSend" class="primary-btn ai-coach-send" data-i18n="send">Send</button>
+            </form>
+
+            <p class="ai-coach-disclaimer" data-i18n="aiCoachDisclaimer">General fitness guidance only. Stop if you experience pain and seek professional advice when needed.</p>
+          </div>
+
+          <aside class="card ai-coach-sidebar">
+            <h3 data-i18n="aiCoachYourProfile">🎯 Your Training Profile</h3>
+            <p data-i18n="aiCoachProfileDescription">The coach can use your saved profile to personalize guidance.</p>
+
+            <div id="aiCoachProfileSummary" class="ai-coach-profile-summary">
+              <p data-i18n="aiCoachProfileLoading">Your profile summary will appear here.</p>
+            </div>
+
+            <div class="section-box">
+              <h3 data-i18n="aiCoachTopics">What can we work on?</h3>
+              <ul>
+                <li data-i18n="aiCoachTopicTraining">Training plans and exercise selection</li>
+                <li data-i18n="aiCoachTopicStrength">Powerlifting and strength progression</li>
+                <li data-i18n="aiCoachTopicMuscle">Muscle growth and recovery</li>
+                <li data-i18n="aiCoachTopicHabits">Workout consistency and habits</li>
+              </ul>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </main>
+
+    <!-- BOTTOM NAVIGATION -->
+    <nav class="bottom-nav" aria-label="Main navigation">
+      <button type="button" class="nav-btn active" data-page="dashboard">🏠 <span data-i18n="home">Home</span></button>
+      <button type="button" class="nav-btn" data-page="workout">🏋️ <span data-i18n="training">Training</span></button>
+      <button type="button" class="nav-btn" data-page="calories">🍽️ <span data-i18n="caloriesNav">Calories</span></button>
+      <button type="button" class="nav-btn" data-page="progress">📈 <span data-i18n="progressNav">Progress</span></button>
+      <button type="button" class="nav-btn" data-page="rank">🏆 <span data-i18n="rankNav">Rank</span></button>
+      <button type="button" class="nav-btn" data-page="arena">⚔️ <span data-i18n="arenaNav">1v1</span></button>
+      <button type="button" class="nav-btn" data-page="leaderboard">🌍 <span data-i18n="world">World</span></button>
+      <button type="button" class="nav-btn" data-page="doctorNutrition">🩺 <span data-i18n="doctor">Doctor</span></button>
+      <button type="button" class="nav-btn" data-page="aiCoach">🤖 <span data-i18n="aiCoachTitle">AI Coach</span></button>
+      <button type="button" class="nav-btn" data-page="profile">⚙️ <span data-i18n="profileNav">Profile</span></button>
+    </nav>
+  </div>
+
+  <!-- TOAST NOTIFICATIONS -->
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <!-- RANK-UP MODAL -->
+  <div id="rankUpModal" class="rank-up-modal hidden" role="dialog" aria-modal="true" aria-labelledby="rankUpName">
+    <div class="rank-up-card">
+      <div class="rank-up-glow"></div>
+      <div id="rankUpBadge" class="rank-up-badge"></div>
+      <span data-i18n="rankUp">RANK UP!</span>
+      <h2 id="rankUpName" data-i18n="newRank">New Rank</h2>
+      <p id="rankUpText"></p>
+      <button type="button" id="closeRankUp" class="primary-btn" data-i18n="continue">Continue</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
